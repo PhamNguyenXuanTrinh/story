@@ -2,12 +2,15 @@ const { config } = require("dotenv");
 const express = require("express");
 require("dotenv")/config()
 const connectDb = require("./configs/connectDb")
+const initRouters = require("./routers")
 app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //connect db
 connectDb()
+
+initRouters(app)
 app.get("/", (req, res) => {
   res.send("running");
 });
