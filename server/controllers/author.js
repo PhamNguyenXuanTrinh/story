@@ -11,7 +11,7 @@ const ctrlAuthor = {
         });
       }
 
-      const newAuthor = await Author.create(req.body);
+      const newAuthor = await Author.create({ name });
       return res.status(200).json({
         success: true,
         message: "User created successfully",
@@ -48,7 +48,7 @@ const ctrlAuthor = {
   getOneAuthor: async (req, res) => {
     try {
       const { _id } = req.params;
-      const getOneAuthor = await Author.findById(_id);
+      const getOneAuthor = await Author.findById(_id).populate("story");
 
       return res.status(200).json({
         success: getOneAuthor ? true : false,
