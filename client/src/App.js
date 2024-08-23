@@ -1,18 +1,17 @@
-import React from 'react'
-import {BrowserRouter as Routers, Routes, Route} from 'react-router-dom'
-import { HomePage } from './Pages/HomePage/HomePage'
-import { DetailPage } from './Pages/DetailPage/DetailPage'
+import React from "react";
+import path from "./ultils/path";
+import { Routes, Route } from "react-router-dom";
+import { Home, Public } from "./pages/public";
 function App() {
-  
   return (
-    <div>
-      <Routers>
-        <Routes>
-          <Route path='/' element={<HomePage/>}/>
-          <Route path='/detail' element={<DetailPage/>}/>
-        </Routes>
-      </Routers>
+    <div className="min-h-screen">
+      <Routes>
+        <Route path={path.PUBLIC} element={<Public />}>
+          <Route path={path.HOME} element = {<Home/>}/>
+        </Route>
+      </Routes>
     </div>
-  )
+  );
 }
-export default App
+
+export default App;
