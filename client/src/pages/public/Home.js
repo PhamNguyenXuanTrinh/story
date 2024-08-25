@@ -1,9 +1,13 @@
-import React from 'react'
+import React from "react";
+import CategoryHot from "../../components/CategoryHot";
 
 const Home = () => {
   return (
-    <div>Homeccdfdfdfdfdfd</div>
-  )
-}
+    <div className="border w-main h-[auto] ">
+      <CategoryHot />
+    </div>
+  );
+};
 
-export default Home
+export default Home;
+ 
