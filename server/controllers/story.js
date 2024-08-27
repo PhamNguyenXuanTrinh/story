@@ -214,6 +214,63 @@ const ctrlStory = {
       });
     }
   },
+
+  // search story
+  searchStory: async (req, res) => {
+    try {
+      const { title, authorName, genreNames } = req.query;
+      let query = {};
+
+      if (title) {
+        query.title = { $regex: title, $options: "i" }; // Case-insensitive search
+      }
+
+      if (authorName) {
+        const author = await Author.findOne({
+          name: { $regex: authorName, $options: "i" },
+        });
+        if (author) {
+          query.author = author._id;
+        } else {
+          return res.status(404).json({
+            success: false,
+            message: "Author not found",
+          });
+        }
+      }
+
+      if (genreNames) {
+        const genreArray = genreNames.split(",");
+        const genreIds = await Genre.find({
+          name: { $in: genreArray.map((name) => new RegExp(name, "i")) },
+        }).select("_id");
+
+        if (genreIds.length > 0) {
+          query.genre = { $in: genreIds.map((genre) => genre._id) };
+        } else {
+          return res.status(404).json({
+            success: false,
+            message: "Genres not found",
+          });
+        }
+      }
+
+      const searchResults = await Story.find(query)
+        .populate("author", "name")
+        .populate("genre", "name");
+
+      return res.status(200).json({
+        success: true,
+        message: "Search results retrieved successfully",
+        data: searchResults,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+      });
+    }
+  },
 };
 
 module.exports = ctrlStory;
