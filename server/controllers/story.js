@@ -5,7 +5,7 @@ const Genre = require("../models/genre");
 const ctrlStory = {
   addStory: async (req, res) => {
     try {
-      const { title, authorName, genreNames } = req.body;
+      const { title, authorName, genreNames, image } = req.body;
 
       if (!title || !authorName || !genreNames || !Array.isArray(genreNames)) {
         return res.status(400).json({
@@ -35,6 +35,7 @@ const ctrlStory = {
         title,
         author: author._id,
         genre: genreIds,
+        image,
       });
 
       // Cập nhật danh sách sách của tác giả
