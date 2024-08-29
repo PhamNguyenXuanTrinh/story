@@ -1,18 +1,17 @@
 const Genre = require("../models/genre");
-
+const slugify = require("slugify");
 const ctrlGenre = {
   addGenre: async (req, res) => {
     try {
       const { name, description } = req.body;
-
-      if (!name|| !description) {
+      if (!name || !description) {
         return res.status(400).json({
           success: false,
           message: "Missing input",
         });
       }
 
-      const newGenre = await Genre.create(req.body);
+      const newGenre = await Genre.create({ slug: slugify(req.body.title) });
       return res.status(200).json({
         success: true,
         message: "Genre created successfully",
@@ -30,13 +29,16 @@ const ctrlGenre = {
   updateGenre: async (req, res) => {
     try {
       const { _id } = req.params;
+      req.body.slug = slugify(req.body.title);
       const updateGenre = await Genre.findByIdAndUpdate(_id, req.body, {
         new: true,
       });
 
       return res.status(200).json({
         success: updateGenre ? true : false,
-        message: updateGenre ? "Genre updated successfully" : "Genre update failed",
+        message: updateGenre
+          ? "Genre updated successfully"
+          : "Genre update failed",
         data: updateGenre,
       });
     } catch (err) {
@@ -55,7 +57,9 @@ const ctrlGenre = {
 
       return res.status(200).json({
         success: getOneGenre ? true : false,
-        message: getOneGenre ? "Genre retrieved successfully" : "Genre not found",
+        message: getOneGenre
+          ? "Genre retrieved successfully"
+          : "Genre not found",
         data: getOneGenre,
       });
     } catch (err) {
@@ -65,31 +69,29 @@ const ctrlGenre = {
       });
     }
   },
-  getGenre: async (req,res) =>{
+  getGenre: async (req, res) => {
     try {
-      
-        // Populate author và genres
-        const getGenre = await Genre.find()
-          .populate("story")
-  
-        if (!getGenre) {
-          return res.status(404).json({
-            success: false,
-            message: "Book not found",
-          });
-        }
-  
-        return res.status(200).json({
-          success: true,
-          message: "Book retrieved successfully",
-          data: getGenre,
-        });
-      } catch (err) {
-        return res.status(500).json({
+      // Populate author và genres
+      const getGenre = await Genre.find().populate("story");
+
+      if (!getGenre) {
+        return res.status(404).json({
           success: false,
-          message: "Server error",
+          message: "Book not found",
         });
       }
+
+      return res.status(200).json({
+        success: true,
+        message: "Book retrieved successfully",
+        data: getGenre,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+      });
+    }
   },
   // Delete genre
   deleteGenre: async (req, res) => {
@@ -99,7 +101,9 @@ const ctrlGenre = {
 
       return res.status(200).json({
         success: deleteGenre ? true : false,
-        message: deleteGenre ? "Genre deleted successfully" : "Genre delete failed",
+        message: deleteGenre
+          ? "Genre deleted successfully"
+          : "Genre delete failed",
         data: deleteGenre,
       });
     } catch (err) {

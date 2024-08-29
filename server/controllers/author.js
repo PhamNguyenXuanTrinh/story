@@ -1,17 +1,17 @@
 const Author = require("../models/author");
+const slugify = require("slugify");
 const ctrlAuthor = {
   addAuthor: async (req, res) => {
     try {
       const { name } = req.body;
-
+      if (req.body.name) req.body.slug = slugify(req.body.name);
       if (!name) {
         return res.status(400).json({
           success: false,
           message: "Missing input",
         });
       }
-
-      const newAuthor = await Author.create({ name });
+      const newAuthor = await Author.create(req.body);
       return res.status(200).json({
         success: true,
         message: "User created successfully",
@@ -28,6 +28,7 @@ const ctrlAuthor = {
   updateAuthor: async (req, res) => {
     try {
       const { _id } = req.params;
+      if (req.body.name) req.body.slug = slugify(req.body.name);
       const updateAuthor = await Author.findByIdAndUpdate(_id, req.body, {
         new: true,
       });

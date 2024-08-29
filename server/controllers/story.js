@@ -1,12 +1,11 @@
 const Story = require("../models/story");
 const Author = require("../models/author");
 const Genre = require("../models/genre");
-
+const slugify = require("slugify");
 const ctrlStory = {
   addStory: async (req, res) => {
     try {
       const { title, authorName, genreNames, image } = req.body;
-
       if (!title || !authorName || !genreNames || !Array.isArray(genreNames)) {
         return res.status(400).json({
           success: false,
@@ -15,7 +14,9 @@ const ctrlStory = {
       }
 
       // Tìm hoặc tạo mới tác giả
-      let author = await Author.findOne({ name: authorName });
+      let author = await Author.findOne({
+        name: authorName,
+      });
       if (!author) {
         author = await Author.create({ name: authorName, story: [] });
       }
@@ -35,7 +36,7 @@ const ctrlStory = {
         title,
         author: author._id,
         genre: genreIds,
-        image,
+        image, slug: slugify(req.body.title),
       });
 
       // Cập nhật danh sách sách của tác giả
@@ -182,6 +183,7 @@ const ctrlStory = {
       // Cập nhật thông tin truyện
       const updateData = {
         title,
+        slug: slugify(req.body.title),
         author: author ? author._id : undefined,
         genre: genreIds.length > 0 ? genreIds : undefined,
         description,

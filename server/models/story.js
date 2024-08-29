@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const storySchema = new mongoose.Schema({
   title: { type: String, required: true },
+  slug: { type: String },
   author: { type: mongoose.Types.ObjectId, ref: "Author", require: true },
   description: { type: String },
   content: { type: String },

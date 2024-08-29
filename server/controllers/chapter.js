@@ -1,11 +1,10 @@
 const Chapter = require("../models/chapter");
 const Story = require("../models/story");
-
+const slugify = require("slugify");
 const ctrlChapter = {
   addChapter: async (req, res) => {
     try {
       const { storyId, title, content } = req.body;
-
       if (!storyId || !title || !content) {
         return res.status(400).json({
           success: false,
@@ -36,6 +35,7 @@ const ctrlChapter = {
         title,
         content,
         chapterNumber: newChapterNumber,
+        slug: slugify(req.body.title)
       });
 
       // Update the story's chapter list
@@ -104,6 +104,7 @@ const ctrlChapter = {
   updateChapter: async (req, res) => {
     try {
       const { _id } = req.params;
+      req.body.slug = slugify(req.body.title);
       const updatedChapter = await Chapter.findByIdAndUpdate(_id, req.body, {
         new: true,
       });
