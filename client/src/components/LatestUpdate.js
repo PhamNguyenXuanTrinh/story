@@ -1,6 +1,6 @@
 import React from "react";
 
-const StoryTable = () => {
+const LatestUpdate = () => {
   // Sample data to be replaced with actual data from your API
   const stories = [
     {
@@ -24,7 +24,9 @@ const StoryTable = () => {
           <tr>
             <th className="border border-gray-300 p-2 text-left">Thể Loại</th>
             <th className="border border-gray-300 p-2 text-left">Tên Truyện</th>
-            <th className="border border-gray-300 p-2 text-left">Chương Cuối</th>
+            <th className="border border-gray-300 p-2 text-left">
+              Chương Cuối
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -32,7 +34,9 @@ const StoryTable = () => {
             <tr key={index}>
               <td className="border border-gray-300 p-2">{story.genre}</td>
               <td className="border border-gray-300 p-2">{story.title}</td>
-              <td className="border border-gray-300 p-2">{story.latestChapter}</td>
+              <td className="border border-gray-300 p-2">
+                {story.latestChapter}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -41,4 +45,4 @@ const StoryTable = () => {
   );
 };
 
-export default StoryTable;
+export default LatestUpdate;

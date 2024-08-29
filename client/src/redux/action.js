@@ -1,6 +1,6 @@
 // redux/action.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import * as apis from "../apis/index";
+import * as apis from "../apis";
 
 export const apiGetStory = createAsyncThunk(
   "app/stories",

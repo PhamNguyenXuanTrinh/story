@@ -1,12 +1,13 @@
 import React from "react";
-import CategoryHot from "../../components/CategoryHot";
-import LatestUpdates from "../../components/LatestUpdate";
+import {CategoryHot, CategoryComplete, LatestUpdate} from "../../components";
+
 
 const Home = () => {
   return (
     <div className="border w-main h-[auto] ">
       <CategoryHot />
-      <LatestUpdates/>
+      <LatestUpdate/>
+      <CategoryComplete/>
     </div>
   );
 };
