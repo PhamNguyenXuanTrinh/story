@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { apiGetStory } from "./redux/action"; // Assuming this is the correct path
-import { Home, Public } from "./pages/public"; // Assuming these are correctly imported
+import { Home, Public, Detail } from "./pages/public"; // Assuming these are correctly imported
 import path from "./ultils/path"; // Assuming this is the correct path for the path utilities
 
 function App() {
@@ -17,6 +17,8 @@ function App() {
       <Routes>
         <Route path={path.PUBLIC} element={<Public />}>
           <Route path={path.HOME} element={<Home />} />
+          <Route path={path.STORY+"/:id"} element={<Detail />} />
+          {/* Detail page route */}
         </Route>
       </Routes>
     </div>

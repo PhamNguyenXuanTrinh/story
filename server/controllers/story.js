@@ -35,8 +35,9 @@ const ctrlStory = {
       const newStory = await Story.create({
         title,
         author: author._id,
-        genre: genreIds,
-        image, slug: slugify(req.body.title),
+        genres: genreIds,
+        image,
+        slug: slugify(req.body.title),
       });
 
       // Cập nhật danh sách sách của tác giả
@@ -69,7 +70,7 @@ const ctrlStory = {
       // Populate author và genres
       const getStory = await Story.findById(_id)
         .populate("author", "name")
-        .populate("genre", "name");
+        .populate("genres", "name");
 
       if (!getStory) {
         return res.status(404).json({
@@ -93,21 +94,63 @@ const ctrlStory = {
 
   getAllStory: async (req, res) => {
     try {
-      const getAllStory = await Story.find()
+      const queries = { ...req.query };
+      const excludeFields = ["limit", "sort", "page", "fields"];
+      excludeFields.forEach((el) => delete queries[el]);
+
+      // Format the query operators to match MongoDB syntax
+      let queryString = JSON.stringify(queries);
+      queryString = queryString.replace(
+        /\b(gte|gt|lt|lte)\b/g,
+        (el) => "$" + el
+      );
+
+      const formatQuery = JSON.parse(queryString);
+
+      // Handle title search with regex
+      if (queries?.title) {
+        formatQuery.title = { $regex: queries.title, $options: "i" };
+      }
+
+      // Create filtering query
+      let queryCommand = Story.find(formatQuery); // Ensure `Story` is used instead of `Product`
+
+      // Sorting
+      if (req.query.sort) {
+        const sortBy = req.query.sort.split(",").join(" ");
+        queryCommand = queryCommand.sort(sortBy);
+      }
+
+      // Fields limiting
+      if (req.query.fields) {
+        const fields = req.query.fields.split(",").join(" ");
+        queryCommand = queryCommand.select(fields);
+      }
+
+      // Pagination
+      const page = +req.query.page || 1;
+      const limit = +req.query.limit || process.env.LIMIT_PRODUCTS || 10;
+      const skip = (page - 1) * limit;
+      queryCommand = queryCommand.skip(skip).limit(limit);
+
+      // Execute query and count documents
+      const response = await queryCommand
         .populate("author", "name")
-        .populate("genre", "name");
+        .populate("genres", "name")
+        .exec();
+
+      const counts = await Story.countDocuments(formatQuery);
 
       return res.status(200).json({
-        success: getAllStory ? true : false,
-        message: getAllStory
-          ? "Books retrieved successfully"
-          : "Failed to retrieve books",
-        data: getAllStory,
+        status: "OK",
+        message: response.length ? "success" : "No stories found",
+        counts,
+        data: response,
       });
     } catch (err) {
       return res.status(500).json({
-        success: false,
-        message: "Server error",
+        status: "error",
+        message: err.message,
       });
     }
   },
@@ -185,7 +228,7 @@ const ctrlStory = {
         title,
         slug: slugify(req.body.title),
         author: author ? author._id : undefined,
-        genre: genreIds.length > 0 ? genreIds : undefined,
+        genres: genreIds.length > 0 ? genreIds : undefined,
         description,
         content,
         image,

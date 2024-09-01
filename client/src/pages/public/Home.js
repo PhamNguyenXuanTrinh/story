@@ -1,5 +1,5 @@
 import React from "react";
-import {CategoryHot, CategoryComplete, LatestUpdate} from "../../components";
+import {CategoryHot, CategoryComplete, LatestUpdate,} from "../../components";
 
 
 const Home = () => {

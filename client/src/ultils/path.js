@@ -1,6 +1,7 @@
 const path = {
     "PUBLIC": "/",
     "HOME": "",
-    "ALL": "*"
+    "ALL": "*",
+    "STORY":"story"
 }
 export default path

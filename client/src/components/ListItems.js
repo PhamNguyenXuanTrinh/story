@@ -1,16 +1,27 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import getImages from "../ultils/cofigImages";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import configImage from "../ultils/configImage";
+
 export const ListItems = () => {
   const { stories } = useSelector((state) => state.app);
+  const navigate = useNavigate(); // Hook to navigate programmatically
 
+  // Function to handle item click
+  const handleItemClick = (id) => {
+    navigate(`/story/${id}`); // Navigate to the detail page with the story ID
+  };
 
   return (
     <div className="grid grid-cols-4 gap-4 p-4">
       {stories?.data.map((el) => (
-        <div key={el._id} className="flex flex-col items-center">
+        <div
+          key={el._id}
+          className="flex flex-col items-center cursor-pointer" // Add cursor pointer
+          onClick={() => handleItemClick(el._id)} // Handle click event
+        >
           <img
-            src={getImages(el.image)} // Dynamically import the image
+            src={configImage(el.image)} // Dynamically import the image
             alt={el.title}
             className="w-48 h-64 object-cover"
           />

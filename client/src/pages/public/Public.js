@@ -1,14 +1,15 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import { Header, Nav } from "../../components";
+import { Header, Nav, Footer } from "../../components";
 const Public = () => {
   return (
-    <div className="w-[100%] flex items-center flex-col">
-      <Header className="" />
+    <div className="flex flex-col min-h-screen items-center">
+      <Header />
       <Nav />
       <div>
         <Outlet className="w-min" />
       </div>
+      <Footer />
     </div>
   );
 };
