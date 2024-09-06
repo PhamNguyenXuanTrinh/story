@@ -46,7 +46,7 @@ const Detail = () => {
             <span className="text-yellow-400 mr-2">⭐⭐⭐⭐⭐</span>
           </div>
           <div className="flex items-center gap-4 mt-4">
-            <span>Chương: {story.currentChapter}</span>
+            <span>Chương: {story.chapter.length}</span>
             <span>Đánh giá: {story.rating}</span>
             <span
               className={`status ${
