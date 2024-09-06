@@ -5,7 +5,19 @@ const slugify = require("slugify");
 const ctrlStory = {
   addStory: async (req, res) => {
     try {
-      const { title, authorName, genreNames, image } = req.body;
+      const {
+        title,
+        authorName,
+        genreNames,
+        image,
+        description,
+        content,
+        status,
+        rating,
+        chapter,
+      } = req.body;
+
+      // Kiểm tra các trường đầu vào
       if (!title || !authorName || !genreNames || !Array.isArray(genreNames)) {
         return res.status(400).json({
           success: false,
@@ -14,9 +26,7 @@ const ctrlStory = {
       }
 
       // Tìm hoặc tạo mới tác giả
-      let author = await Author.findOne({
-        name: authorName,
-      });
+      let author = await Author.findOne({ name: authorName });
       if (!author) {
         author = await Author.create({ name: authorName, story: [] });
       }
@@ -37,6 +47,11 @@ const ctrlStory = {
         author: author._id,
         genres: genreIds,
         image,
+        description: description || "", // Mô tả (nếu có)
+        content: content || "", // Nội dung (nếu có)
+        status: status || false, // Trạng thái (mặc định: chưa hoàn thành)
+        rating: rating || 5, // Điểm đánh giá (mặc định: 5)
+        chapter: chapter || [], // Danh sách chương (nếu có)
         slug: slugify(req.body.title),
       });
 
@@ -52,13 +67,14 @@ const ctrlStory = {
 
       return res.status(200).json({
         success: true,
-        message: "Book created successfully",
+        message: "Story created successfully",
         data: newStory,
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
         message: "Server error",
+        error: err.message,
       });
     }
   },
@@ -158,14 +174,23 @@ const ctrlStory = {
   deleteStory: async (req, res) => {
     try {
       const { _id } = req.params;
+
+      // Tìm và xóa truyện
       const deleteStory = await Story.findByIdAndDelete(_id);
 
       if (deleteStory) {
-        // Remove story references from author and genres
-        await Author.updateOne(
-          { _id: deleteStory.author },
-          { $pull: { story: _id } }
-        );
+        // Xóa các chương liên quan đến truyện đã xóa
+        await Chapter.deleteMany({ story: _id });
+
+        // Kiểm tra và xóa tác giả nếu không còn truyện nào khác của tác giả
+        const authorStoriesCount = await Story.countDocuments({
+          author: deleteStory.author,
+        });
+        if (authorStoriesCount === 0) {
+          await Author.findByIdAndDelete(deleteStory.author);
+        }
+
+        // Xóa các liên kết giữa truyện và thể loại (genres)
         await Genre.updateMany(
           { _id: { $in: deleteStory.genre } },
           { $pull: { story: _id } }
@@ -175,7 +200,7 @@ const ctrlStory = {
       return res.status(200).json({
         success: deleteStory ? true : false,
         message: deleteStory
-          ? "Book deleted successfully"
+          ? "Book and related data deleted successfully"
           : "Failed to delete book",
         data: deleteStory,
       });
