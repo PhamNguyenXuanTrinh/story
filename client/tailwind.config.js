@@ -9,7 +9,7 @@ module.exports = {
       backgroundColor: {
         main: 'rgb(183 138 40)'
       },
-      Color: {
+      colors: {
         main: 'rgb(183 138 40)'
       },
     },
