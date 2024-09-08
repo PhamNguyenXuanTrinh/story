@@ -11,7 +11,11 @@ const ctrlGenre = {
         });
       }
 
-      const newGenre = await Genre.create({ slug: slugify(req.body.title) });
+      // Tạo thể loại mới với dữ liệu đã chỉnh sửa
+      const newGenre = await Genre.create({
+        ...req.body,
+        slug: slugify(req.body.name),
+      });
       return res.status(200).json({
         success: true,
         message: "Genre created successfully",

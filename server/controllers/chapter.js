@@ -35,7 +35,7 @@ const ctrlChapter = {
         title,
         content,
         chapterNumber: newChapterNumber,
-        slug: slugify(req.body.title)
+        slug: slugify(req.body.title),
       });
 
       // Update the story's chapter list
@@ -81,22 +81,33 @@ const ctrlChapter = {
   },
 
   getAllChapters: async (req, res) => {
+    const { _id } = req.params;
+
     try {
-      const { storyId } = req.params;
+      // Log the _id to ensure it's correct
 
-      const chapters = await Chapter.find({ story: storyId }).sort({
-        chapterNumber: 1,
-      });
+      // Log the chapters result for debugging
+      console.log("Chapters found:", chapters);
 
+      // If no chapters found, return a 404 response
+      if (!chapters || chapters.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No chapters found for this story",
+        });
+      }
+
+      // If chapters are found, return them
       return res.status(200).json({
         success: true,
         message: "Chapters retrieved successfully",
         data: chapters,
       });
-    } catch (err) {
+    } catch (error) {
+      console.error("Error retrieving chapters:", error);
       return res.status(500).json({
         success: false,
-        message: "Server error",
+        message: "Failed to retrieve chapters. Server error.",
       });
     }
   },
