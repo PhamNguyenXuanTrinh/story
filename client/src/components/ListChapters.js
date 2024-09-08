@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { apiGetChapters } from "../apis";
-
+import { useNavigate } from "react-router-dom";
 const ListChapters = ({ storyId }) => {
+  const navigate = useNavigate(); // Hook to navigate programmatically
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [chaptersPerPage] = useState(20); // Customize the number of chapters per page
   const [searchTerm, setSearchTerm] = useState("");
+  const handleItemClick = (id) => {
+    navigate(`/chapter/${id}`); // Navigate to the detail page with the story ID
+  };
 
   useEffect(() => {
     const fetchChapters = async () => {
@@ -75,10 +79,13 @@ const ListChapters = ({ storyId }) => {
       <div className="grid grid-cols-2 gap-4 bg-white p-4 border rounded">
         {currentChapters.map((chapter) => (
           <div
+            onClick={() => handleItemClick(chapter._id)} // Handle click event
             key={chapter._id}
             className="flex justify-between p-2 border-b border-gray-300 hover:bg-gray-100"
           >
-            <span className="font-semibold">Chương {chapter.chapterNumber}:</span>
+            <span className="font-semibold">
+              Chương {chapter.chapterNumber}:
+            </span>
             <span>{chapter.title}</span>
           </div>
         ))}
@@ -107,7 +114,9 @@ const ListChapters = ({ storyId }) => {
           </button>
         ))}
         <button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           disabled={currentPage === totalPages}
           className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
         >

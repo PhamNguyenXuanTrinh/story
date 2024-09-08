@@ -17,9 +17,10 @@ function App() {
       <Routes>
         <Route path={path.PUBLIC} element={<Public />}>
           <Route path={path.HOME} element={<Home />} />
-          <Route path={path.STORY+"/:id"} element={<Detail />} />
-          <Route path={path.GENRES+"/:id"} element={<Genres />} />
-          <Route path={path.CHAPTER+"/:id"} element={<Chapter />} />
+          <Route path={path.STORY + "/:id"} element={<Detail />} />
+          <Route path={path.GENRES + "/:id"} element={<Genres />} />
+          <Route path={path.CHAPTER + "/:id"} element={<Chapter />} />
+
           {/* Detail page route */}
         </Route>
       </Routes>

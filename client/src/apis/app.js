@@ -27,3 +27,8 @@ export const apiGetGenre = (id) =>
       url: `chapter/all/${id}`, // Endpoint to fetch a single story by ID
       method: "get",
     });
+    export const apiGetChapter = (id) =>
+      axios({
+        url: `chapter/${id}`, // Endpoint to fetch a single story by ID
+        method: "get",
+      });
