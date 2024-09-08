@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import string from "../../ultils/string";
 import { apiGetSingleStory } from "../../apis";
 import configImage from "../../ultils/configImage";
+import { ListChapters } from "../../components";
 const Detail = () => {
   const { id } = useParams(); // Extract story ID from the URL
   const [story, setStory] = useState(null);
@@ -38,7 +39,7 @@ const Detail = () => {
       .join(" ");
   };
   return (
-    <div className="justify-center w-full">
+    <div className="justify-center w-full ">
       <div className="mx-auto w-main">
         <div className="p-6 bg-gray-800 text-white flex gap-6 w-main">
           <div className="flex-shrink-0 w-60 h-80">
@@ -73,7 +74,7 @@ const Detail = () => {
               </div>
               {/* Genres */}
 
-              <div className="flex gap-2 mt-4">
+              <div className="flex gap-2 mt-4 cursor-pointer">
                 {story.genres.map((genre) => (
                   <div
                     key={genre._id}
@@ -87,13 +88,14 @@ const Detail = () => {
             </div>
           </div>
         </div>
-        <div className="w-full ">
+        <div className="w-full my-6">
           <h1 className="mt-20 font-bold border-b-4 hover:text-main">
             <u>{string.info}</u>
           </h1>
           <p>{story.content}</p>
         </div>
       </div>
+      <ListChapters storyId={id} />
     </div>
   );
 };

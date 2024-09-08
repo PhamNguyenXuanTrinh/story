@@ -3,6 +3,7 @@ const path = {
     "HOME": "",
     "ALL": "*",
     "STORY":"story",
-    "GENRES": "genres"
+    "GENRES": "genres",
+    "CHAPTER": "chapter"
 }
 export default path

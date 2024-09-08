@@ -86,8 +86,9 @@ const ctrlChapter = {
     try {
       // Log the _id to ensure it's correct
 
-      // Log the chapters result for debugging
-      console.log("Chapters found:", chapters);
+      const chapters = await Chapter.find({ story: _id }).sort({
+        chapterNumber: 1,
+      });
 
       // If no chapters found, return a 404 response
       if (!chapters || chapters.length === 0) {
