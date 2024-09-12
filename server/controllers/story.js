@@ -2,6 +2,11 @@ const Story = require("../models/story");
 const Author = require("../models/author");
 const Genre = require("../models/genre");
 const slugify = require("slugify");
+
+const generateSlug = (text) => {
+  return slugify(text, { lower: true, strict: true }).replace(/j/g, '');
+};
+
 const ctrlStory = {
   addStory: async (req, res) => {
     try {
@@ -17,7 +22,6 @@ const ctrlStory = {
         chapter,
       } = req.body;
 
-      // Kiểm tra các trường đầu vào
       if (!title || !authorName || !genreNames || !Array.isArray(genreNames)) {
         return res.status(400).json({
           success: false,
@@ -25,48 +29,43 @@ const ctrlStory = {
         });
       }
 
-      // Tìm hoặc tạo mới tác giả
       let author = await Author.findOne({ name: authorName });
       if (!author) {
         author = await Author.create({
           name: authorName,
-          slug: slugify(authorName),
+          slug: generateSlug(authorName),
           story: [],
         });
       }
 
-      // Tìm hoặc tạo mới các thể loại
       let genreIds = [];
       for (let genreName of genreNames) {
         let genre = await Genre.findOne({ name: genreName });
         if (!genre) {
           genre = await Genre.create({
             name: genreName,
-            slug: slugify(genreName),
+            slug: generateSlug(genreName),
             story: [],
           });
         }
         genreIds.push(genre._id);
       }
 
-      // Tạo mới quyển sách với thông tin đầy đủ
       const newStory = await Story.create({
         title,
         author: author._id,
         genres: genreIds,
         image,
-        description: description || "", // Mô tả (nếu có)
-        content: content || "", // Nội dung (nếu có)
-        status: status || false, // Trạng thái (mặc định: chưa hoàn thành)
-        rating: rating || 5, // Điểm đánh giá (mặc định: 5)
-        chapter: chapter || [], // Danh sách chương (nếu có)
-        slug: slugify(req.body.title),
+        description: description || "",
+        content: content || "",
+        status: status || false,
+        rating: rating || 5,
+        chapter: chapter || [],
+        slug: generateSlug(title),
       });
 
-      // Cập nhật danh sách sách của tác giả
       await author.updateOne({ $push: { story: newStory._id } });
 
-      // Cập nhật danh sách sách cho mỗi thể loại
       for (let genreId of genreIds) {
         await Genre.findByIdAndUpdate(genreId, {
           $push: { story: newStory._id },
@@ -91,33 +90,27 @@ const ctrlStory = {
     try {
       const { slug } = req.params;
 
-      // Populate author và genres
       const getStory = await Story.findOne({ slug })
-        .populate({
-          path: "author",
-          select: "name",
-        })
-        .populate({
-          path: "genres",
-          select: "name slug",
-        });
+        .populate({ path: "author", select: "name" })
+        .populate({ path: "genres", select: "name slug" });
 
       if (!getStory) {
         return res.status(404).json({
           success: false,
-          message: "Book not found",
+          message: "Story not found",
         });
       }
 
       return res.status(200).json({
         success: true,
-        message: "Book retrieved successfully",
+        message: "Story retrieved successfully",
         data: getStory,
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
         message: "Server error",
+        error: err.message,
       });
     }
   },
@@ -128,7 +121,6 @@ const ctrlStory = {
       const excludeFields = ["limit", "sort", "page", "fields"];
       excludeFields.forEach((el) => delete queries[el]);
 
-      // Format the query operators to match MongoDB syntax
       let queryString = JSON.stringify(queries);
       queryString = queryString.replace(
         /\b(gte|gt|lt|lte)\b/g,
@@ -137,55 +129,44 @@ const ctrlStory = {
 
       const formatQuery = JSON.parse(queryString);
 
-      // Handle title search with regex
       if (queries?.title) {
         formatQuery.title = { $regex: queries.title, $options: "i" };
       }
 
-      // Create filtering query
-      let queryCommand = Story.find(formatQuery); // Ensure `Story` is used instead of `Product`
+      let queryCommand = Story.find(formatQuery);
 
-      // Sorting
       if (req.query.sort) {
         const sortBy = req.query.sort.split(",").join(" ");
         queryCommand = queryCommand.sort(sortBy);
       }
 
-      // Fields limiting
       if (req.query.fields) {
         const fields = req.query.fields.split(",").join(" ");
         queryCommand = queryCommand.select(fields);
       }
 
-      // Pagination
       const page = +req.query.page || 1;
-      const limit = +req.query.limit || process.env.LIMIT_PRODUCTS || 10;
+      const limit = +req.query.limit || 10;
       const skip = (page - 1) * limit;
       queryCommand = queryCommand.skip(skip).limit(limit);
 
-      // Execute query and count documents
       const response = await queryCommand
-        .populate({
-          path: "author",
-          select: "name",
-        })
-        .populate({
-          path: "genres",
-          select: "name slug",
-        });
+        .populate({ path: "author", select: "name" })
+        .populate({ path: "genres", select: "name slug" });
 
       const counts = await Story.countDocuments(formatQuery);
 
       return res.status(200).json({
-        status: "OK",
-        message: response.length ? "success" : "No stories found",
+        success: true,
+        message: response.length ? "Stories retrieved successfully" : "No stories found",
         counts,
         data: response,
       });
     } catch (err) {
       return res.status(500).json({
-        status: "error",
-        message: err.message,
+        success: false,
+        message: "Server error",
+        error: err.message,
       });
     }
   },
@@ -194,24 +175,18 @@ const ctrlStory = {
     try {
       const { _id } = req.params;
 
-      // Tìm và xóa truyện
       const deleteStory = await Story.findByIdAndDelete(_id);
 
       if (deleteStory) {
-        // Xóa các chương liên quan đến truyện đã xóa
         await Chapter.deleteMany({ story: _id });
 
-        // Kiểm tra và xóa tác giả nếu không còn truyện nào khác của tác giả
-        const authorStoriesCount = await Story.countDocuments({
-          author: deleteStory.author,
-        });
+        const authorStoriesCount = await Story.countDocuments({ author: deleteStory.author });
         if (authorStoriesCount === 0) {
           await Author.findByIdAndDelete(deleteStory.author);
         }
 
-        // Xóa các liên kết giữa truyện và thể loại (genres)
         await Genre.updateMany(
-          { _id: { $in: deleteStory.genre } },
+          { _id: { $in: deleteStory.genres } },
           { $pull: { story: _id } }
         );
       }
@@ -219,14 +194,15 @@ const ctrlStory = {
       return res.status(200).json({
         success: deleteStory ? true : false,
         message: deleteStory
-          ? "Book and related data deleted successfully"
-          : "Failed to delete book",
+          ? "Story and related data deleted successfully"
+          : "Failed to delete story",
         data: deleteStory,
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
         message: "Server error",
+        error: err.message,
       });
     }
   },
@@ -246,31 +222,38 @@ const ctrlStory = {
         chapter,
       } = req.body;
 
-      // Tìm hoặc tạo mới tác giả nếu có thay đổi
       let author;
       if (authorName) {
         author = await Author.findOne({ name: authorName });
         if (!author) {
-          author = await Author.create({ name: authorName, story: [] });
+          author = await Author.create({
+            name: authorName,
+            slug: generateSlug(authorName),
+            story: [],
+          });
         }
       }
 
-      // Tìm hoặc tạo mới các thể loại nếu có thay đổi
       let genreIds = [];
       if (genreNames) {
         for (let genreName of genreNames) {
           let genre = await Genre.findOne({ name: genreName });
           if (!genre) {
-            genre = await Genre.create({ name: genreName, story: [] });
+            genre = await Genre.create({
+              name: genreName,
+              slug: generateSlug(genreName),
+              story: [],
+            });
           }
           genreIds.push(genre._id);
         }
       }
-      const slug = req.body.title;
-      // Cập nhật thông tin truyện
+
+      const slug = title ? generateSlug(title) : undefined;
+
       const updateData = {
         title,
-        slug: slug,
+        slug,
         author: author ? author._id : undefined,
         genres: genreIds.length > 0 ? genreIds : undefined,
         description,
@@ -281,38 +264,35 @@ const ctrlStory = {
         chapter,
       };
 
-      // Loại bỏ các trường undefined khỏi updateData
       Object.keys(updateData).forEach(
         (key) => updateData[key] === undefined && delete updateData[key]
       );
 
-      const updateStory = await Story.findByIdAndUpdate(_id, updateData, {
-        new: true,
-      });
+      const updateStory = await Story.findByIdAndUpdate(_id, updateData, { new: true });
 
       return res.status(200).json({
         success: updateStory ? true : false,
         message: updateStory
-          ? "Book updated successfully"
-          : "Failed to update book",
+          ? "Story updated successfully"
+          : "Failed to update story",
         data: updateStory,
       });
     } catch (err) {
       return res.status(500).json({
         success: false,
         message: "Server error",
+        error: err.message,
       });
     }
   },
 
-  // search story
   searchStory: async (req, res) => {
     try {
       const { title, authorName, genreNames } = req.query;
       let query = {};
 
       if (title) {
-        query.title = { $regex: title, $options: "i" }; // Case-insensitive search
+        query.title = { $regex: title, $options: "i" };
       }
 
       if (authorName) {
@@ -336,7 +316,7 @@ const ctrlStory = {
         }).select("_id");
 
         if (genreIds.length > 0) {
-          query.genre = { $in: genreIds.map((genre) => genre._id) };
+          query.genres = { $in: genreIds.map((genre) => genre._id) };
         } else {
           return res.status(404).json({
             success: false,
@@ -347,7 +327,7 @@ const ctrlStory = {
 
       const searchResults = await Story.find(query)
         .populate("author", "name")
-        .populate("genre", "name");
+        .populate("genres", "name slug");
 
       return res.status(200).json({
         success: true,
@@ -358,6 +338,7 @@ const ctrlStory = {
       return res.status(500).json({
         success: false,
         message: "Server error",
+        error: err.message,
       });
     }
   },
