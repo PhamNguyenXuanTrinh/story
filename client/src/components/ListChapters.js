@@ -8,8 +8,8 @@ const ListChapters = ({ storyId }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [chaptersPerPage] = useState(20); // Customize the number of chapters per page
   const [searchTerm, setSearchTerm] = useState("");
-  const handleItemClick = (id) => {
-    navigate(`/chapter/${id}`); // Navigate to the detail page with the story ID
+  const handleItemClick = (slugStory, slugChapter) => {
+    navigate(`/chapter/${slugStory}/${slugChapter}`); // Navigate to the detail page with the story ID
   };
 
   useEffect(() => {
@@ -79,7 +79,7 @@ const ListChapters = ({ storyId }) => {
       <div className="grid grid-cols-2 gap-4 bg-white p-4 border rounded">
         {currentChapters.map((chapter) => (
           <div
-            onClick={() => handleItemClick(chapter._id)} // Handle click event
+            onClick={() => handleItemClick(chapter.story.slug,chapter.slug)} // Handle click event
             key={chapter._id}
             className="flex justify-between p-2 border-b border-gray-300 hover:bg-gray-100"
           >

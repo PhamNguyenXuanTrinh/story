@@ -13,7 +13,7 @@ router.get("/", ctrlStory.getAllStory);
 router.get("/search", ctrlStory.searchStory);
 
 // Get a story by ID
-router.get("/:_id", ctrlStory.getStory);
+router.get("/:slug", ctrlStory.getStory);
 
 // Update a story by ID
 router.put("/:_id", ctrlStory.updateStory);

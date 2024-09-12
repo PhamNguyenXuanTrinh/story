@@ -8,8 +8,8 @@ export const ListItems = () => {
   const navigate = useNavigate(); // Hook to navigate programmatically
 
   // Function to handle item click
-  const handleItemClick = (id) => {
-    navigate(`/story/${id}`); // Navigate to the detail page with the story ID
+  const handleItemClick = (slug) => {
+    navigate(`/story/${slug}`); // Navigate to the detail page with the story ID
   };
 
   return (
@@ -19,7 +19,7 @@ export const ListItems = () => {
         <div
           key={el._id}
           className="flex flex-col items-center cursor-pointer" // Add cursor pointer
-          onClick={() => handleItemClick(el._id)} // Handle click event
+          onClick={() => handleItemClick(el.slug)} // Handle click event
         >
           <img
             src={configImage(el.image)} // Dynamically import the image

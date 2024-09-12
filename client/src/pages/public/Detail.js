@@ -7,18 +7,18 @@ import { apiGetSingleStory } from "../../apis";
 import configImage from "../../ultils/configImage";
 import { ListChapters } from "../../components";
 const Detail = () => {
-  const { id } = useParams(); // Extract story ID from the URL
+  const { slug } = useParams(); // Extract story ID from the URL
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate(); // Hook to navigate programmatically
-  const handleItemClick = (id) => {
-    navigate(`/genres/${id}`); // Navigate to the detail page with the story ID
+  const handleItemClick = (slug) => {
+    navigate(`/genres/${slug}`); // Navigate to the detail page with the story ID
   };
 
   useEffect(() => {
     const fetchStory = async () => {
       try {
-        const response = await apiGetSingleStory(id);
+        const response = await apiGetSingleStory(slug);
         console.log(response.data.data);
         setStory(response.data.data);
       } catch (error) {
@@ -29,7 +29,7 @@ const Detail = () => {
     };
 
     fetchStory();
-  }, [id]);
+  }, [slug]);
   if (loading) return <p>Loading...</p>;
   if (!story) return <p>Story not found</p>;
   const capitalizeWords = (str) => {
@@ -78,7 +78,7 @@ const Detail = () => {
                 {story.genres.map((genre) => (
                   <div
                     key={genre._id}
-                    onClick={() => handleItemClick(genre._id)} // Handle click event
+                    onClick={() => handleItemClick(genre.slug)} // Handle click event
                     className="tag border"
                   >
                     {capitalizeWords(genre.name)}
@@ -95,7 +95,7 @@ const Detail = () => {
           <p>{story.content}</p>
         </div>
       </div>
-      <ListChapters storyId={id} />
+      <ListChapters storyId={story._id} />
     </div>
   );
 };

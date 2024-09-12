@@ -12,23 +12,23 @@ export const apiGetStory = (limit) =>
   });
 
 // Fetch a single story by its ID
-export const apiGetSingleStory = (id) =>
+export const apiGetSingleStory = (slug) =>
   axios({
-    url: `story/${id}`, // Endpoint to fetch a single story by ID
+    url: `story/${slug}`, // Endpoint to fetch a single story by ID
     method: "get",
   });
-export const apiGetGenre = (id) =>
+export const apiGetGenre = (slug) =>
   axios({
-    url: `genre/${id}`, // Endpoint to fetch a single story by ID
+    url: `genre/${slug}`, // Endpoint to fetch a single story by ID
     method: "get",
   });
-  export const apiGetChapters = (id) =>
-    axios({
-      url: `chapter/all/${id}`, // Endpoint to fetch a single story by ID
-      method: "get",
-    });
-    export const apiGetChapter = (id) =>
-      axios({
-        url: `chapter/${id}`, // Endpoint to fetch a single story by ID
-        method: "get",
-      });
+export const apiGetChapters = (id) =>
+  axios({
+    url: `chapter/all/${id}`, // Endpoint to fetch a single story by ID
+    method: "get",
+  });
+export const apiGetChapter = (slugStory, slugChapter) =>
+  axios({
+    url: `chapter/${slugStory}/${slugChapter}`, // Endpoint to fetch a single story by ID
+    method: "get",
+  });

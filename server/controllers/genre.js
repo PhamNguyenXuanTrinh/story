@@ -56,9 +56,14 @@ const ctrlGenre = {
   // Get one genre
   getOneGenre: async (req, res) => {
     try {
-      const { _id } = req.params;
-      const getOneGenre = await Genre.findById(_id).populate("story");
-
+      const { slug } = req.params;
+      const getOneGenre = await Genre.findOne({ slug }).populate({
+        path: "story",
+        populate: {
+          path: "genres author",
+          select: "slug name",
+        },
+      });
       return res.status(200).json({
         success: getOneGenre ? true : false,
         message: getOneGenre

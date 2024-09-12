@@ -28,7 +28,11 @@ const ctrlStory = {
       // Tìm hoặc tạo mới tác giả
       let author = await Author.findOne({ name: authorName });
       if (!author) {
-        author = await Author.create({ name: authorName, story: [] });
+        author = await Author.create({
+          name: authorName,
+          slug: slugify(authorName),
+          story: [],
+        });
       }
 
       // Tìm hoặc tạo mới các thể loại
@@ -36,7 +40,11 @@ const ctrlStory = {
       for (let genreName of genreNames) {
         let genre = await Genre.findOne({ name: genreName });
         if (!genre) {
-          genre = await Genre.create({ name: genreName, story: [] });
+          genre = await Genre.create({
+            name: genreName,
+            slug: slugify(genreName),
+            story: [],
+          });
         }
         genreIds.push(genre._id);
       }
@@ -81,12 +89,18 @@ const ctrlStory = {
 
   getStory: async (req, res) => {
     try {
-      const { _id } = req.params;
+      const { slug } = req.params;
 
       // Populate author và genres
-      const getStory = await Story.findById(_id)
-        .populate("author", "name")
-        .populate("genres", "name");
+      const getStory = await Story.findOne({ slug })
+        .populate({
+          path: "author",
+          select: "name",
+        })
+        .populate({
+          path: "genres",
+          select: "name slug",
+        });
 
       if (!getStory) {
         return res.status(404).json({
@@ -151,9 +165,14 @@ const ctrlStory = {
 
       // Execute query and count documents
       const response = await queryCommand
-        .populate("author", "name")
-        .populate("genres", "name")
-        .exec();
+        .populate({
+          path: "author",
+          select: "name",
+        })
+        .populate({
+          path: "genres",
+          select: "name slug",
+        });
 
       const counts = await Story.countDocuments(formatQuery);
 
@@ -223,7 +242,7 @@ const ctrlStory = {
         content,
         image,
         status,
-        vote,
+        rating,
         chapter,
       } = req.body;
 
@@ -247,18 +266,18 @@ const ctrlStory = {
           genreIds.push(genre._id);
         }
       }
-
+      const slug = req.body.title;
       // Cập nhật thông tin truyện
       const updateData = {
         title,
-        slug: slugify(req.body.title),
+        slug: slug,
         author: author ? author._id : undefined,
         genres: genreIds.length > 0 ? genreIds : undefined,
         description,
         content,
         image,
         status,
-        vote,
+        rating,
         chapter,
       };
 
