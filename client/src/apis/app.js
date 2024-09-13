@@ -57,7 +57,7 @@ export const apiDeleteStory = (_id) =>
   /// ADMIN chapter
 export const apiAddChapter = (storyData) =>
   axios({
-    url: `story/`,
+    url: `chapter/`,
     method: "post",
     data: storyData, // Send storyData as the request body
   });

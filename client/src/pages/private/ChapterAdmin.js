@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { apiAddChapter, apiUpdateChapter, apiDeleteChapter } from "../../apis";
+import { ListChapters } from "../../components"; // Assuming ListChapters displays chapter list correctly
+import { useParams } from "react-router-dom";
+import { apiAddChapter, apiUpdateChapter, apiDeleteChapter, apiGetChapters } from "../../apis"; // API functions for chapters
 
 // TextInput Component
-const TextInput = ({ label, name, value, onChange, required = false, type = "text" }) => (
+const TextInput = ({ label, name, value, onChange, required = false }) => (
   <div>
     <label className="block font-bold">{label}</label>
     <input
-      type={type}
+      type="text"
       name={name}
       value={value}
       onChange={onChange}
@@ -32,32 +33,39 @@ const TextArea = ({ label, name, value, onChange, required = false }) => (
 );
 
 const ChapterAdmin = () => {
-  const { chapters } = useSelector((state) => state.app);
-
-  const [form, setForm] = useState({
-    title: "",
-    content: "",
-    chapterNumber: "",
-    storyId: "",
-  });
+  const { _id: storyId } = useParams(); // Extract story ID from the URL
+  const [chapters, setChapters] = useState([]); // Local state for chapters
+  const [form, setForm] = useState({ title: "", content: "" });
   const [selectedChapterId, setSelectedChapterId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ error: null, success: null });
 
-  // Fetch chapter data if selected
+  // Fetch chapters when component mounts or storyId changes
+  useEffect(() => {
+    const fetchChapters = async () => {
+      try {
+        setLoading(true);
+        const response = await apiGetChapters(storyId);
+        setChapters(response.data.data || []);
+      } catch (error) {
+        console.error("Failed to fetch chapters:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (storyId) fetchChapters();
+  }, [storyId]);
+
+  // Fetch chapter data if selected for editing
   useEffect(() => {
     if (selectedChapterId) {
-      const chapter = chapters?.data?.find((c) => c._id === selectedChapterId);
+      const chapter = chapters.find((ch) => ch._id === selectedChapterId);
       if (chapter) {
-        setForm({
-          title: chapter.title || "",
-          content: chapter.content || "",
-          chapterNumber: chapter.chapterNumber || "",
-          storyId: chapter.story || "",
-        });
+        setForm({ title: chapter.title || "", content: chapter.content || "" });
       }
     }
-  }, [selectedChapterId, chapters?.data]);
+  }, [selectedChapterId, chapters]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,19 +81,29 @@ const ChapterAdmin = () => {
     setMessage({ error: null, success: null });
 
     try {
+      if (!storyId) {
+        setMessage({ error: "Missing story ID.", success: null });
+        return;
+      }
+
       if (selectedChapterId) {
+        // Update chapter
         await apiUpdateChapter(selectedChapterId, form);
         setMessage({ success: "Chapter updated successfully!", error: null });
+        setChapters((prev) =>
+          prev.map((ch) =>
+            ch._id === selectedChapterId ? { ...ch, ...form } : ch
+          )
+        );
       } else {
-        await apiAddChapter(form);
+        // Add new chapter
+        const chapterData = { ...form, storyId }; // Add storyId to the form data
+        console.log("Adding chapter with data:", chapterData); // Debug: Check the data being sent
+        const response = await apiAddChapter(chapterData);
         setMessage({ success: "Chapter added successfully!", error: null });
+        setChapters((prev) => [...prev, response.data]);
       }
-      setForm({
-        title: "",
-        content: "",
-        chapterNumber: "",
-        storyId: "",
-      });
+      setForm({ title: "", content: "" });
       setSelectedChapterId(null);
     } catch (error) {
       setMessage({
@@ -97,11 +115,12 @@ const ChapterAdmin = () => {
     }
   };
 
-  const handleDelete = async (_id) => {
+  const handleDelete = async (chapterId) => {
     if (window.confirm("Are you sure you want to delete this chapter?")) {
       try {
-        await apiDeleteChapter(_id);
+        await apiDeleteChapter(chapterId);
         setMessage({ success: "Chapter deleted successfully!", error: null });
+        setChapters((prev) => prev.filter((ch) => ch._id !== chapterId));
       } catch (error) {
         setMessage({
           error: "Failed to delete chapter. Please try again.",
@@ -116,58 +135,22 @@ const ChapterAdmin = () => {
   };
 
   return (
-    <div>
-      <div className="w-main">
-        <h1 className="text-2xl font-bold mb-4">Chapter Admin</h1>
+    <div className="w-main">
+      <h1 className="text-2xl font-bold mb-4">Manage Chapters</h1>
 
-        <table className="min-w-full table-auto bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 text-left border">Title</th>
-              <th className="px-4 py-2 text-left border">Chapter Number</th>
-              <th className="px-4 py-2 text-left border">Story ID</th>
-              <th className="px-4 py-2 text-left border">Edit</th>
-              <th className="px-4 py-2 text-left border">Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {chapters?.data?.length ? (
-              chapters.data.map((ch) => (
-                <tr key={ch._id} className="border-b">
-                  <td className="px-4 py-2 border">{ch.title}</td>
-                  <td className="px-4 py-2 border">{ch.chapterNumber}</td>
-                  <td className="px-4 py-2 border">{ch.story}</td>
-                  <td className="px-4 py-2 border">
-                    <button
-                      onClick={() => handleEdit(ch)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      Edit
-                    </button>
-                  </td>
-                  <td className="px-4 py-2 border">
-                    <button
-                      onClick={() => handleDelete(ch._id)}
-                      className="ml-2 text-red-500 hover:text-red-700"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="px-4 py-2 text-center">
-                  No chapters available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* List of Chapters */}
+      <ListChapters
+        storyId={storyId}
+        chapters={chapters}
+        onEditChapter={handleEdit}
+        onDeleteChapter={handleDelete}
+      />
 
+      {/* Form for Adding/Editing Chapters */}
       <div className="py-20 bg-white border rounded w-main">
-        <h2 className="text-2xl font-bold mb-4">Add/Edit Chapter</h2>
+        <h2 className="text-2xl font-bold mb-4">
+          {selectedChapterId ? "Edit Chapter" : "Add New Chapter"}
+        </h2>
 
         {message.error && <p className="text-red-500">{message.error}</p>}
         {message.success && <p className="text-green-500">{message.success}</p>}
@@ -177,21 +160,6 @@ const ChapterAdmin = () => {
             label="Title"
             name="title"
             value={form.title}
-            onChange={handleChange}
-            required
-          />
-          <TextInput
-            label="Chapter Number"
-            name="chapterNumber"
-            value={form.chapterNumber}
-            onChange={handleChange}
-            type="number"
-            required
-          />
-          <TextInput
-            label="Story ID"
-            name="storyId"
-            value={form.storyId}
             onChange={handleChange}
             required
           />

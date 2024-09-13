@@ -9,10 +9,17 @@ const totalPages = 30; // Number of chapters you want to scrape
 
 // Array of story names to scrape
 const storyNames = [
-  "xich-tam-tuan-thien",
   "tu-hai-nhi-bat-dau-nhap-dao",
-  "bat-dau-nu-ma-dau-phu-ta",
-  "cau-tha-thanh-thanh-nhan-tien-quan-trieu-ta-cham-ngua",
+  "van-co-than-de",
+  "tu-luyen-gian-luoc-hoa-cong-phap-bat-dau",
+  "quang-am-chi-ngoai",
+  "xich-tam-tuan-thien",
+  "tran-hoi-truong-sinh",
+  "ta-co-mot-than-bi-dong-ky",
+  "nhan-dao-dai-thanh",
+  "luan-hoi-nhac-vien",
+  "vi-phu-chi-muon-lang-lang-nhin-xem-nguoi-truong-sinh",
+  
 
   // Add more story names as needed
 ];

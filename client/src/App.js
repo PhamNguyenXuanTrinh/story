@@ -28,8 +28,8 @@ function App() {
           {/* Detail page route */}
         </Route>
         <Route path={path.PRIVATE} element={<Private />}>
-        <Route path={path.PRODUCT_ADMIN} element={<ProductAdmin />} />
-        <Route path={path.CHAPTER_ADMIN} element={<ChapterAdmin />} />
+          <Route path={path.PRODUCT_ADMIN} element={<ProductAdmin />} />
+          <Route path={path.CHAPTER_ADMIN + "/:_id"} element={<ChapterAdmin />} />
         </Route>
       </Routes>
     </div>

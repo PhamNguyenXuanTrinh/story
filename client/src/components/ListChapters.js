@@ -79,7 +79,7 @@ const ListChapters = ({ storyId }) => {
       <div className="grid grid-cols-2 gap-4 bg-white p-4 border rounded">
         {currentChapters.map((chapter) => (
           <div
-            onClick={() => handleItemClick(chapter.story.slug,chapter.slug)} // Handle click event
+            onClick={() => handleItemClick(chapter.story.slug, chapter.slug)} // Handle click event
             key={chapter._id}
             className="flex justify-between p-2 border-b border-gray-300 hover:bg-gray-100"
           >

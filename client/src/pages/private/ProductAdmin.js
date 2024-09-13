@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { apiAddStory, apiUpdateStory, apiDeleteStory } from "../../apis";
 import { useSelector } from "react-redux";
 
 // TextInput Component
-const TextInput = ({ label, name, value, onChange, required = false, type = "text" }) => (
+const TextInput = ({
+  label,
+  name,
+  value,
+  onChange,
+  required = false,
+  type = "text",
+}) => (
   <div>
     <label className="block font-bold">{label}</label>
     <input
@@ -66,9 +74,14 @@ const GenresInput = ({ genres = [], onAddGenre, onRemoveGenre }) => (
 );
 
 // AddStory Component
-const AddStory = () => {
-  const { stories } = useSelector((state) => state.app);
+const ProductAdmin = () => {
+  // Function to handle item click
 
+  const navigate = useNavigate(); // Hook to navigate programmatically
+  const { stories } = useSelector((state) => state.app);
+  const handleItemClick = (_id) => {
+    navigate(`chapter/all/${_id}`); // Navigate to the detail page with the story ID
+  };
   const [form, setForm] = useState({
     title: "",
     authorName: "",
@@ -203,7 +216,14 @@ const AddStory = () => {
             {stories?.data?.length ? (
               stories.data.map((el) => (
                 <tr key={el._id} className="border-b">
-                  <td className="px-4 py-2 border">{el.title}</td>
+                  <td
+                    className="px-4 py-2 border"
+                    onClick={() => {
+                      handleItemClick(el._id);
+                    }}
+                  >
+                    {el.title}
+                  </td>
                   <td className="px-4 py-2 border">{el.authorName}</td>
                   <td className="px-4 py-2 border">{el.description}</td>
                   <td className="px-4 py-2 border">{el.rating}</td>
@@ -320,4 +340,4 @@ const AddStory = () => {
   );
 };
 
-export default AddStory;
+export default ProductAdmin;

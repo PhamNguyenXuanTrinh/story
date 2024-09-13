@@ -5,10 +5,10 @@ const path = {
   ALL: "*",
   STORY: "story",
   GENRES: "genres",
-  CHAPTER: "story/:slugStory/chapter",
+  CHAPTER: "chapter",
   // admin
-  PRODUCT_ADMIN: "product", 
-  CHAPTER_ADMIN: "chapter", 
+  PRODUCT_ADMIN: "product",
+  CHAPTER_ADMIN: "product/chapter/all",
 };
 
 export default path;
