@@ -58,15 +58,25 @@ const ctrlChapter = {
     try {
       const { storySlug, chapterSlug } = req.params;
 
-      // Find the chapter by chapterSlug and ensure it belongs to the correct story using storySlug
-      const chapter = await Chapter.findOne({ slug: chapterSlug }).populate({
-        path: "story",
-        match: { slug: storySlug }, // Match the story slug
-        select: "title", // Select only the story title
+      // First, find the story by the slug
+      const story = await Story.findOne({ slug: storySlug }).select("title");
+
+      // If no story is found, return 404
+      if (!story) {
+        return res.status(404).json({
+          success: false,
+          message: "Story not found",
+        });
+      }
+
+      // Find the chapter by the chapterSlug and ensure it belongs to the correct story
+      const chapter = await Chapter.findOne({
+        slug: chapterSlug,
+        story: story._id, // Ensure the chapter belongs to the found story
       });
 
-      // If no chapter or story is found, return 404
-      if (!chapter || !chapter.story) {
+      // If no chapter is found, return 404
+      if (!chapter) {
         return res.status(404).json({
           success: false,
           message: "Chapter not found",
@@ -76,7 +86,10 @@ const ctrlChapter = {
       return res.status(200).json({
         success: true,
         message: "Chapter retrieved successfully",
-        data: chapter,
+        data: {
+          ...chapter.toObject(),
+          story, // Include story information
+        },
       });
     } catch (err) {
       return res.status(500).json({
