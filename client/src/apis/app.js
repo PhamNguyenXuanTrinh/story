@@ -11,7 +11,7 @@ export const apiGetStory = (limit) =>
     },
   });
 
-// Fetch a single story by its ID
+///get
 export const apiGetSingleStory = (slug) =>
   axios({
     url: `story/${slug}`, // Endpoint to fetch a single story by ID
@@ -31,4 +31,46 @@ export const apiGetChapter = (slugStory, slugChapter) =>
   axios({
     url: `chapter/${slugStory}/${slugChapter}`, // Endpoint to fetch a single story by ID
     method: "get",
+  });
+
+/// ADMIN Story
+export const apiAddStory = (storyData) =>
+  axios({
+    url: `story/`,
+    method: "post",
+    data: storyData, // Send storyData as the request body
+  });
+export const apiUpdateStory = (_id, storyData) =>
+  axios({
+    url: `story/${_id}`,
+    method: "put",
+    data: storyData,
+  });
+
+// Delete a story by _id
+export const apiDeleteStory = (_id) =>
+  axios({
+    url: `story/${_id}`,
+    method: "delete",
+  });
+
+  /// ADMIN chapter
+export const apiAddChapter = (storyData) =>
+  axios({
+    url: `story/`,
+    method: "post",
+    data: storyData, // Send storyData as the request body
+  });
+export const apiUpdateChapter = (_id, storyData) =>
+  axios({
+    url: `story/${_id}`,
+    method: "put",
+    data: storyData,
+  });
+
+// Delete a story by _id
+export const apiDeleteChapter = (_id) =>
+  axios({
+    url: `story/${_id}`,
+    method: "delete",
   });
