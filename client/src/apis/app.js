@@ -22,6 +22,11 @@ export const apiGetGenre = (slug) =>
     url: `genre/${slug}`, // Endpoint to fetch a single story by ID
     method: "get",
   });
+  export const apiGetAllGenre = (slug) =>
+    axios({
+      url: `genre/`, // Endpoint to fetch a single story by ID
+      method: "get",
+    });
 export const apiGetChapters = (id) =>
   axios({
     url: `chapter/all/${id}`, // Endpoint to fetch a single story by ID
@@ -33,6 +38,8 @@ export const apiGetChapter = (slugStory, slugChapter) =>
     method: "get",
   });
 
+
+  
 /// ADMIN Story
 export const apiAddStory = (storyData) =>
   axios({

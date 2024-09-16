@@ -4,8 +4,9 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import string from "../../ultils/string";
 import { apiGetSingleStory } from "../../apis";
-import configImage from "../../ultils/configImage";
+import { configImage, capitalizeWords } from "../../ultils";
 import { ListChapters } from "../../components";
+
 const Detail = () => {
   const { slug } = useParams(); // Extract story ID from the URL
   const [story, setStory] = useState(null);
@@ -32,12 +33,7 @@ const Detail = () => {
   }, [slug]);
   if (loading) return <p>Loading...</p>;
   if (!story) return <p>Story not found</p>;
-  const capitalizeWords = (str) => {
-    return str
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-  };
+
   return (
     <div className="justify-center w-full ">
       <div className="mx-auto w-main">

@@ -1,7 +1,45 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Logo from "../assets/logo.png";
+import SupMenu from "./SupMenu";
+import { apiGetAllGenre } from "../apis/app";
 
 const Header = () => {
+  const [genre, setGenre] = useState(null);
+  const [activeMenu, setActiveMenu] = useState(null); // State for managing active menu
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const response = await apiGetAllGenre();
+        setGenre(response.data.data);
+      } catch (error) {
+        console.error("Failed to fetch genre details:", error);
+      }
+    };
+
+    fetchGenres();
+  }, []);
+
+  const handleItemClick = (slug) => {
+    navigate(`/genres/${slug}`);
+    setActiveMenu(null); // Close the submenu after navigation
+  };
+
+  const handleMenuToggle = (menu) => {
+    setActiveMenu(activeMenu === menu ? null : menu); // Toggle the active menu
+  };
+
+  const genreItems = genre?.map((g) => ({
+    name: g.name,
+    slug: g.slug,
+  }));
+
+  const listItems = ["Submenu 1", "Submenu 2", "Submenu 3"];
+  const genreListItems = genreItems?.map((g) => g.name);
+  const settingItems = ["Submenu 1", "Submenu 2", "Submenu 3"];
+
   return (
     <div className="border-b w-full h-[70px] py-[10px] bg-main flex justify-center">
       <div className="w-main h-full flex justify-between items-center">
@@ -13,9 +51,28 @@ const Header = () => {
 
         {/* Navigation Menu */}
         <ul className="flex space-x-6 items-center">
-          <li className="text-white text-lg cursor-pointer">Danh sách</li>
-          <li className="text-white text-lg cursor-pointer">Thể Loại</li>
-          <li className="text-white text-lg cursor-pointer">Tùy Chỉnh</li>
+          <SupMenu
+            title="Danh sách"
+            items={listItems}
+            isOpen={activeMenu === "danhSach"}
+            onToggle={() => handleMenuToggle("danhSach")}
+          />
+          <SupMenu
+            title="Thể Loại"
+            items={genreListItems}
+            isOpen={activeMenu === "theLoai"}
+            onToggle={() => handleMenuToggle("theLoai")}
+            onItemClick={(itemName) => {
+              const genreItem = genreItems.find((g) => g.name === itemName);
+              if (genreItem) handleItemClick(genreItem.slug);
+            }}
+          />
+          <SupMenu
+            title="Tùy Chỉnh"
+            items={settingItems}
+            isOpen={activeMenu === "tuyChinh"}
+            onToggle={() => handleMenuToggle("tuyChinh")}
+          />
         </ul>
 
         {/* Search Bar */}

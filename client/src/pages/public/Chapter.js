@@ -60,7 +60,7 @@ const Chapter = () => {
     <div className="w-full max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       {/* Chapter Header */}
       <header className="mb-6">
-        <h1 className="text-4xl font-bold text-gray-900">
+        <h1 className="text-4xl font-bold text-gray-900 text-center">
           {chapter.data.title}
         </h1>
       </header>
@@ -78,9 +78,7 @@ const Chapter = () => {
           onClick={goToPreviousChapter}
           disabled={isFirstChapter} // Disable if it's the first chapter
           className={`px-4 py-2 rounded ${
-            isFirstChapter
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-main "
+            isFirstChapter ? "bg-gray-400 cursor-not-allowed" : "bg-main "
           } text-white transition`}
         >
           &larr; Chương Trước
@@ -90,9 +88,7 @@ const Chapter = () => {
           onClick={goToNextChapter}
           disabled={isLastChapter} // Disable if it's the last chapter
           className={`px-4 py-2 rounded ${
-            isLastChapter
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-main "
+            isLastChapter ? "bg-gray-400 cursor-not-allowed" : "bg-main "
           } text-white transition`}
         >
           Chương Sau &rarr;
