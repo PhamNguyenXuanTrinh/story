@@ -22,11 +22,11 @@ export const apiGetGenre = (slug) =>
     url: `genre/${slug}`, // Endpoint to fetch a single story by ID
     method: "get",
   });
-  export const apiGetAllGenre = (slug) =>
-    axios({
-      url: `genre/`, // Endpoint to fetch a single story by ID
-      method: "get",
-    });
+export const apiGetAllGenre = (slug) =>
+  axios({
+    url: `genre/`, // Endpoint to fetch a single story by ID
+    method: "get",
+  });
 export const apiGetChapters = (id) =>
   axios({
     url: `chapter/all/${id}`, // Endpoint to fetch a single story by ID
@@ -38,8 +38,14 @@ export const apiGetChapter = (slugStory, slugChapter) =>
     method: "get",
   });
 
+// Search stories by query
+export const apiSearchStories = (query) =>
+  axios({
+    url: `story/search`, // Define your search endpoint here
+    method: "get",
+    params: { query }, // Pass the query parameter
+  });
 
-  
 /// ADMIN Story
 export const apiAddStory = (storyData) =>
   axios({
@@ -61,7 +67,7 @@ export const apiDeleteStory = (_id) =>
     method: "delete",
   });
 
-  /// ADMIN chapter
+/// ADMIN chapter
 export const apiAddChapter = (storyData) =>
   axios({
     url: `chapter/`,

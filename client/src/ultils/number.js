@@ -1,4 +1,4 @@
 const number = {
-  limitStories: 12,
+  limitStories: 10,
 };
 export default number;

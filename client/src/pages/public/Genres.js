@@ -38,33 +38,28 @@ const Genres = () => {
 
   return (
     <div className="p-4 w-main">
-      <h1 className="text-2xl font-bold mb-4">Genre: {genre?.data.name}</h1>
+      <h1 className="text-2xl font-bold mb-4">Thể loại: {genre?.data.name}</h1>
       <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-2">{genre?.data.name}</h2>
-        <h2 className="text-xl font-semibold mb-2">{genre?.data.description}</h2>
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold">Stories:</h3>
-          <ul className="list-disc pl-5 mt-2">
-            {genre?.data.story?.map((el) => (
-              <div
-                key={el._id}
-                className="flex flex-col items-center cursor-pointer" // Add cursor pointer
-                onClick={() => handleItemClick(el.slug)} // Handle click event
-              >
-                <img
-                  src={configImage(el.image)} // Dynamically import the image
-                  alt={el.title}
-                  className="w-48 h-64 object-cover"
-                />
-                <p className="text-center text-black mt-2 font-bold">
-                  {el.title}
-                </p>
-                <p className="text-center text-black mt-2 font-bold">
-                  {el.author.name} {/* Assuming 'author' is just a string or an ID */}
-                </p>
-              </div>
-            ))}
-          </ul>
+        <h2 className="text-xl font-semibold mb-2">
+          {genre?.data.description}
+        </h2>
+        <div className="grid grid-cols-5 gap-5 p-4">
+          {genre?.data.story.map((el) => (
+            <div
+              key={el._id}
+              className="flex flex-col items-center cursor-pointer"
+              onClick={() => handleItemClick(el.slug)}
+            >
+              <img
+                src={configImage(el.image)}
+                alt={el.title}
+                className="w-48 h-64 object-cover"
+              />
+              <p className="text-center text-black mt-2 font-bold">
+                {el.title}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
