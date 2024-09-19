@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { apiGetChapters } from "../apis";
 import { useNavigate } from "react-router-dom";
+
 const ListChapters = ({ storyId }) => {
   const navigate = useNavigate(); // Hook to navigate programmatically
   const [chapters, setChapters] = useState([]);
@@ -8,16 +9,15 @@ const ListChapters = ({ storyId }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [chaptersPerPage] = useState(20); // Customize the number of chapters per page
   const [searchTerm, setSearchTerm] = useState("");
+
   const handleItemClick = (slugStory, slugChapter) => {
-    navigate(`/chapter/${slugStory}/${slugChapter}`); // Navigate to the detail page with the story ID
+    navigate(`/chapter/${slugStory}/${slugChapter}`); // Navigate to the chapter detail page
   };
 
   useEffect(() => {
     const fetchChapters = async () => {
       try {
         const response = await apiGetChapters(storyId);
-        console.log("Fetched chapters:", response.data);
-
         if (Array.isArray(response.data.data)) {
           setChapters(response.data.data);
         } else {
@@ -58,35 +58,35 @@ const ListChapters = ({ storyId }) => {
   };
 
   return (
-    <div className="w-full p-6 bg-white rounded-lg shadow-md">
-      <h2 className="font-bold text-2xl mb-4">Danh Sách Chương</h2>
+    <div className="w-full p-4 md:p-6 bg-white rounded-lg shadow-md">
+      <h2 className="font-bold text-xl md:text-2xl mb-4">Danh Sách Chương</h2>
 
       {/* Search input */}
-      <div className="flex justify-between mb-4">
+      <div className="flex flex-col md:flex-row justify-between mb-4">
         <input
           type="text"
           placeholder="Nhập số chương..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border p-2 rounded w-1/2"
+          className="border p-2 rounded w-full md:w-1/2 mb-2 md:mb-0"
         />
-        <button className="bg-yellow-500 text-white px-4 py-2 rounded">
+        <button className="bg-yellow-500 text-white px-4 py-2 rounded md:ml-4">
           Tìm
         </button>
       </div>
 
-      {/* Chapter list in two-column grid */}
-      <div className="grid grid-cols-2 gap-4 bg-white p-4 border rounded">
+      {/* Chapter list in grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 border rounded">
         {currentChapters.map((chapter) => (
           <div
-            onClick={() => handleItemClick(chapter.story.slug, chapter.slug)} // Handle click event
+            onClick={() => handleItemClick(chapter.story.slug, chapter.slug)}
             key={chapter._id}
-            className="flex justify-between p-2 border-b border-gray-300 hover:bg-gray-100"
+            className="flex justify-between p-2 border-b border-gray-300 hover:bg-gray-100 cursor-pointer"
           >
-            <span className="font-semibold">
+            <span className="font-semibold w-[35%]">
               Chương {chapter.chapterNumber}:
             </span>
-            <span>{chapter.title}</span>
+            <span className="text-left">{chapter.title}</span>
           </div>
         ))}
       </div>

@@ -8,7 +8,9 @@ const Private = () => {
       <Header />
       <Nav />
       <div>
-        <Outlet className="w-min" />
+        <div className="flex-1 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Outlet />
+        </div>
       </div>
       <Footer />
     </div>

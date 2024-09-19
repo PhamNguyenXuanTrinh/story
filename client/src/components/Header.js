@@ -67,19 +67,24 @@ const Header = () => {
 
   return (
     <div className="border-b w-full h-[70px] py-[10px] bg-main flex justify-center">
-      <div className="w-full max-w-screen-xl h-full flex justify-between items-center px-4 mx-auto">
+      <div className="w-full max-w-screen-xl h-full flex justify-between items-center px-4 mx-auto ">
         {/* Logo Section */}
-        <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
+        <div
+          className=" items-center cursor-pointer sm:flex mr-5 "
+          onClick={() => navigate("/")}
+        >
           <img
             className="w-12 h-12 md:w-16 md:h-16 object-cover"
             src={Logo}
             alt="Logo"
           />
-          <span className="text-lg md:text-xl font-bold text-white ml-2">TruyenCV</span>
+          <span className="text-lg md:text-xl font-bold text-white ml-2 flex-wrap hidden sm:flex">
+            TruyenCV
+          </span>
         </div>
 
         {/* Navigation Menu */}
-        <ul className="flex space-x-4 md:space-x-6 items-center flex-wrap">
+        <ul className=" space-x-4 md:space-x-6 items-center flex-wrap hidden sm:flex">
           <SupMenu
             title="Danh sách"
             items={listItems}
@@ -99,13 +104,13 @@ const Header = () => {
         </ul>
 
         {/* Search Bar */}
-        <div className="relative flex items-center space-x-2 w-full max-w-md">
+        <div className="relative flex items-center space-x-2 w-full max-w-md sm:w-1/2">
           <input
             type="text"
             placeholder="Tìm kiếm truyện..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className="py-2 px-4 rounded-lg w-full"
+            className="py-2 px-4 rounded-lg w-full outline-none"
           />
           <span className="absolute right-2 top-2/4 transform -translate-y-2/4 text-gray-500">
             <CiSearch size={24} />

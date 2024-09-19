@@ -12,7 +12,7 @@ const TextInput = ({
   required = false,
   type = "text",
 }) => (
-  <div>
+  <div className="w-full">
     <label className="block font-bold">{label}</label>
     <input
       type={type}
@@ -27,7 +27,7 @@ const TextInput = ({
 
 // TextArea Component
 const TextArea = ({ label, name, value, onChange, required = false }) => (
-  <div>
+  <div className="w-full">
     <label className="block font-bold">{label}</label>
     <textarea
       name={name}
@@ -41,7 +41,7 @@ const TextArea = ({ label, name, value, onChange, required = false }) => (
 
 // GenresInput Component
 const GenresInput = ({ genres = [], onAddGenre, onRemoveGenre }) => (
-  <div>
+  <div className="w-full">
     <label className="block font-bold">Genres</label>
     <div className="flex flex-wrap items-center gap-2">
       {genres.length ? (
@@ -73,15 +73,10 @@ const GenresInput = ({ genres = [], onAddGenre, onRemoveGenre }) => (
   </div>
 );
 
-// AddStory Component
+// ProductAdmin Component
 const ProductAdmin = () => {
-  // Function to handle item click
-
   const navigate = useNavigate(); // Hook to navigate programmatically
   const { stories } = useSelector((state) => state.app);
-  const handleItemClick = (_id) => {
-    navigate(`chapter/all/${_id}`); // Navigate to the detail page with the story ID
-  };
   const [form, setForm] = useState({
     title: "",
     authorName: "",
@@ -96,7 +91,6 @@ const ProductAdmin = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ error: null, success: null });
 
-  // Fetch story data if selected
   useEffect(() => {
     if (selectedStoryId) {
       const story = stories?.data?.find((s) => s._id === selectedStoryId);
@@ -197,67 +191,69 @@ const ProductAdmin = () => {
   };
 
   return (
-    <div>
-      <div className="w-main">
+    <div className="p-4 space-y-8">
+      <div className="w-full">
         <h1 className="text-2xl font-bold mb-4">Product Admin</h1>
 
-        <table className="min-w-full table-auto bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 text-left border">Title</th>
-              <th className="px-4 py-2 text-left border">Author</th>
-              <th className="px-4 py-2 text-left border">Description</th>
-              <th className="px-4 py-2 text-left border">Rating</th>
-              <th className="px-4 py-2 text-left border">Edit</th>
-              <th className="px-4 py-2 text-left border">Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {stories?.data?.length ? (
-              stories.data.map((el) => (
-                <tr key={el._id} className="border-b">
-                  <td
-                    className="px-4 py-2 border"
-                    onClick={() => {
-                      handleItemClick(el._id);
-                    }}
-                  >
-                    {el.title}
-                  </td>
-                  <td className="px-4 py-2 border">{el.authorName}</td>
-                  <td className="px-4 py-2 border">{el.description}</td>
-                  <td className="px-4 py-2 border">{el.rating}</td>
-                  <td className="px-4 py-2 border">
-                    <button
-                      onClick={() => handleEdit(el)}
-                      className="text-blue-500 hover:text-blue-700"
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto bg-white border border-gray-200">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="px-4 py-2 text-left border">Title</th>
+                <th className="px-4 py-2 text-left border">Author</th>
+                <th className="px-4 py-2 text-left border">Description</th>
+                <th className="px-4 py-2 text-left border">Rating</th>
+                <th className="px-4 py-2 text-left border">Edit</th>
+                <th className="px-4 py-2 text-left border">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stories?.data?.length ? (
+                stories.data.map((el) => (
+                  <tr key={el._id} className="border-b">
+                    <td
+                      className="px-4 py-2 border whitespace-nowrap cursor-pointer"
+                      onClick={() => navigate(`chapter/all/${el._id}`)}
                     >
-                      Edit
-                    </button>
-                  </td>
-                  <td className="px-4 py-2 border">
-                    <button
-                      onClick={() => handleDelete(el._id)}
-                      className="ml-2 text-red-500 hover:text-red-700"
-                    >
-                      Delete
-                    </button>
+                      {el.title}
+                    </td>
+                    <td className="px-4 py-2 border">{el.authorName}</td>
+                    <td className="px-4 py-2 border">{el.description}</td>
+                    <td className="px-4 py-2 border">{el.rating}</td>
+                    <td className="px-4 py-2 border">
+                      <button
+                        onClick={() => handleEdit(el)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        Edit
+                      </button>
+                    </td>
+                    <td className="px-4 py-2 border">
+                      <button
+                        onClick={() => handleDelete(el._id)}
+                        className="ml-2 text-red-500 hover:text-red-700"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="px-4 py-2 text-center">
+                    No stories available
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="px-4 py-2 text-center">
-                  No stories available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="py-20 bg-white border rounded w-main">
-        <h2 className="text-2xl font-bold mb-4">Add New Story</h2>
+      <div className="py-20 bg-white border rounded w-full">
+        <h2 className="text-2xl font-bold mb-4">
+          {selectedStoryId ? "Edit Story" : "Add New Story"}
+        </h2>
 
         {message.error && <p className="text-red-500">{message.error}</p>}
         {message.success && <p className="text-green-500">{message.success}</p>}
@@ -302,7 +298,7 @@ const ProductAdmin = () => {
             value={form.image}
             onChange={handleChange}
           />
-          <div>
+          <div className="w-full">
             <label className="block font-bold">Status</label>
             <input
               type="checkbox"

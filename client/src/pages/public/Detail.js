@@ -1,4 +1,3 @@
-// StoryDetail.js
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -12,15 +11,15 @@ const Detail = () => {
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate(); // Hook to navigate programmatically
+
   const handleItemClick = (slug) => {
-    navigate(`/genres/${slug}`); // Navigate to the detail page with the story ID
+    navigate(`/genres/${slug}`); // Navigate to the genre page
   };
 
   useEffect(() => {
     const fetchStory = async () => {
       try {
         const response = await apiGetSingleStory(slug);
-        console.log(response.data.data);
         setStory(response.data.data);
       } catch (error) {
         console.error("Failed to fetch story details:", error);
@@ -31,23 +30,24 @@ const Detail = () => {
 
     fetchStory();
   }, [slug]);
+
   if (loading) return <p>Loading...</p>;
   if (!story) return <p>Story not found</p>;
 
   return (
-    <div className="justify-center w-full ">
-      <div className="mx-auto w-main">
-        <div className="p-6 bg-gray-800 text-white flex gap-6 w-main">
-          <div className="flex-shrink-0 w-60 h-80">
+    <div className="justify-center w-full p-4">
+      <div className="mx-auto w-full max-w-screen-lg">
+        <div className="p-6 bg-gray-800 text-white flex flex-col lg:flex-row gap-6">
+          <div className="flex-shrink-0 w-full lg:w-60 h-80">
             <img
               src={configImage(story.image)}
               alt={story.title}
               className="w-full h-full object-cover rounded-md"
             />
           </div>
-          <div className="flex flex-col justify-between">
+          <div className="flex flex-col justify-between w-full">
             <div>
-              <h1 className="text-3xl font-bold">{story.title}</h1>
+              <h1 className="text-2xl lg:text-3xl font-bold">{story.title}</h1>
               <p className="mt-2">
                 <span className="font-semibold">Tác giả:</span>{" "}
                 {story.author.name}
@@ -60,22 +60,19 @@ const Detail = () => {
                 <span>Đánh giá: {story.rating}</span>
                 <span
                   className={`status ${
-                    story.status === true
-                      ? "text-green-500" // Màu xanh cho trạng thái "đã hoàn thành"
-                      : "text-red-500" // Màu đỏ cho trạng thái "còn tiếp"
+                    story.status ? "text-green-500" : "text-red-500"
                   }`}
                 >
-                  {story.status === true ? "Đã hoàn thành" : "Còn tiếp"}
+                  {story.status ? "Đã hoàn thành" : "Còn tiếp"}
                 </span>
               </div>
               {/* Genres */}
-
-              <div className="flex gap-2 mt-4 cursor-pointer">
+              <div className="flex gap-2 mt-4 cursor-pointer flex-wrap">
                 {story.genres.map((genre) => (
                   <div
                     key={genre._id}
                     onClick={() => handleItemClick(genre.slug)} // Handle click event
-                    className="tag border"
+                    className="tag border px-2 py-1"
                   >
                     {capitalizeWords(genre.name)}
                   </div>
@@ -85,10 +82,10 @@ const Detail = () => {
           </div>
         </div>
         <div className="w-full my-6">
-          <h1 className="mt-20 font-bold border-b-4 hover:text-main">
+          <h1 className="mt-10 font-bold border-b-4 border-main hover:text-main">
             <u>{string.info}</u>
           </h1>
-          <p>{story.content}</p>
+          <p className="mt-4">{story.content}</p>
         </div>
       </div>
       <ListChapters storyId={story._id} />
