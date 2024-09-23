@@ -43,7 +43,7 @@ export const apiSearchStories = (query) =>
   axios({
     url: `story/search`, // Define your search endpoint here
     method: "get",
-    params: { query }, // Pass the query parameter
+    params: { ...query }, // Pass the query parameter
   });
 
 /// ADMIN Story

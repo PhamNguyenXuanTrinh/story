@@ -4,6 +4,7 @@ import Logo from "../assets/logo.png";
 import SupMenu from "./SupMenu";
 import { apiGetAllGenre, apiSearchStories } from "../apis/app";
 import { CiSearch } from "react-icons/ci";
+import debounce from "lodash.debounce";
 
 const Header = () => {
   const [genre, setGenre] = useState(null);
@@ -25,27 +26,33 @@ const Header = () => {
     fetchGenres();
   }, []);
 
-  // Handle search input change
+  // Handle search input change with debounce for performance
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
+    debouncedSearchStories(query);
+  };
 
-    // Debounce or throttle the search API call for better performance
+  // Debounced search function to prevent excessive API calls
+  const debouncedSearchStories = debounce(async (query) => {
     if (query.length > 2) {
-      searchStories(query);
+      try {
+        const response = await apiSearchStories({ title: query });
+        setSearchResults(response.data.data);
+      } catch (error) {
+        console.error("Failed to search stories:", error);
+        setSearchResults([]);
+      }
     } else {
       setSearchResults([]); // Clear results if query is too short
     }
-  };
+  }, 300); // 300ms debounce
 
-  // Search stories based on the query
-  const searchStories = async (query) => {
-    try {
-      const response = await apiSearchStories(query);
-      setSearchResults(response.data.data);
-    } catch (error) {
-      console.error("Failed to search stories:", error);
-    }
+  // Handle navigation and reset search
+  const handleResultClick = (slug) => {
+    navigate(`/story/${slug}`);
+    setSearchQuery(""); // Clear the search query
+    setSearchResults([]); // Clear the search results
   };
 
   const handleItemClick = (slug) => {
@@ -84,7 +91,7 @@ const Header = () => {
         </div>
 
         {/* Navigation Menu */}
-        <ul className=" space-x-4 md:space-x-6 items-center flex-wrap hidden sm:flex">
+        <ul className="space-x-4 md:space-x-6 items-center flex-wrap hidden sm:flex">
           <SupMenu
             title="Danh sách"
             items={listItems}
@@ -116,17 +123,21 @@ const Header = () => {
             <CiSearch size={24} />
           </span>
           {/* Display search results */}
-          {searchQuery && searchResults.length > 0 && (
+          {searchQuery && (
             <div className="absolute bg-white shadow-lg mt-2 w-full rounded-lg z-10 top-full">
-              {searchResults.map((story) => (
-                <div
-                  key={story._id}
-                  className="p-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={() => navigate(`/story/${story.slug}`)}
-                >
-                  {story.title}
-                </div>
-              ))}
+              {searchResults.length > 0 ? (
+                searchResults.map((story) => (
+                  <div
+                    key={story._id}
+                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleResultClick(story.slug)}
+                  >
+                    {story.title}
+                  </div>
+                ))
+              ) : (
+                <div className="p-2 text-gray-500">No results found</div>
+              )}
             </div>
           )}
         </div>
